@@ -12,7 +12,8 @@ function doInit()
         dofile("dht.lua")
         local temp,humi=readDHT()
         
-        dofile("mqtt.lua")
+        --dofile("mqtt_cayenne.lua")
+        dofile("mqtt_local.lua")
         publishMQTT(temp,humi)
     end)
 end
