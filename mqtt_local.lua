@@ -7,9 +7,11 @@ function onConnect(client)
 
     do
         local topic=wifi.sta.getmac()
+        topic=string.gsub(topic,":","")
+        
         local payload='{"t":'..tostring(global_temp)..',"h":'..tostring(global_humi)..'}'
         
-        print("publishing to:"..topic.." payload: "..payload)
+        print("publishing to: "..topic.." payload: "..payload)
         client:publish(topic,payload,0,0,onPublishRcvd)
     end
 
