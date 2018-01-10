@@ -10,12 +10,12 @@ function readDHT()
         print("humi = "..humi)
     else
         print("can't read DHT sensor. status: "..status)
-        temp=-1
-        humi=-1
+        temp=nil
+        humi=nil
     end
 
-    if humi > 100 then
-        humi=-1
+    if humi and humi > 100 then
+        humi=nil
     end
     
     return temp,humi

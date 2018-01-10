@@ -4,7 +4,8 @@ function connectWifi(onConnectClb,w)
         function(T)
             print("got IP: " .. T.IP .. 
             " subnet: " .. T.netmask ..
-            " gateway: " .. T.gateway)
+            " gateway: " .. T.gateway ..
+            " dns: " .. net.dns.getdnsserver(0))
             onConnectClb(T)
         end)
 
@@ -83,7 +84,7 @@ function checkAPs(index)
     
         wifi.sta.getap(cfg,1,getAPClbk)
         
-        tmr.alarm(1, 3000, tmr.ALARM_SINGLE, function()
+        tmr.alarm(1, 2500, tmr.ALARM_SINGLE, function()
             checkAPs(index+1)
         end)
     else
