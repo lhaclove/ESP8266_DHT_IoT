@@ -1,18 +1,21 @@
 function doInit()
+    dofile("publisher.lua")
+    
     local timeout=15
     tmr.alarm(0, timeout*1000, tmr.ALARM_SINGLE, function()
-        local sec=30
-        print("going to deepsleep for "..sec.." seconds")
-        node.dsleep(sec*1000*1000)
+        if global.t and global.h then
+            writeToFile(global.t, global.h)
+        end
+        
+        local dsleepSec=30
+        print("going to deepsleep for "..dsleepSec.." seconds")
+        node.dsleep(dsleepSec*1000*1000)
     end)
     
     dofile("wifi.lua")
 
     dofile("dht.lua")
-    local temp,humi=readDHT()
-
-    dofile("publisher.lua")
-    writeToFile(temp,humi)
+    global.t, global.h=readDHT()
         
     checkAndConnect(function(T)
         --dofile("mqtt_cayenne.lua")
@@ -20,6 +23,10 @@ function doInit()
         connectToBroker(publish)
     end)
 end
+
+global={}
+global.t=nil
+global.h=nil
 
 local waitTime=3
 print(waitTime.."secs before init. stop timer 0 to prevent.")
