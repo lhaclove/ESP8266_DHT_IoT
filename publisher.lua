@@ -27,7 +27,7 @@ function getPayload(temp,humi)
     return payload
 end
 
-function parseLog(itemList)
+function parseLog(mqttClient,topic)
     local count=0;
     local log=file.open(globalFilename,"r")
     
@@ -35,19 +35,16 @@ function parseLog(itemList)
         local line=log:readline()
         while line do
             line=line:gsub("\n","")
-            print("read "..line)
-
-            local delPos=line:find(";")
-            local temp=line:sub(0,delPos-1);
-            local humi=line:sub(delPos+1)
+            print(count.." read "..line)
 
             count=count+1
             
-            local reading={}
-            reading.t=temp
-            reading.h=humi
-            
-            itemList[count]=reading
+            local delPos=line:find(";")
+            local temp=line:sub(0,delPos-1)
+            local humi=line:sub(delPos+1)
+            local payload=getPayload(temp,humi)
+
+            publish(mqttClient,topic,payload)
             
             line=log:readline()
         end
@@ -62,29 +59,26 @@ function parseLog(itemList)
     return count
 end
 
-function publish(mqttClient)
+function publish(mqttClient,topic,payload)
+    print("publishing to: "..topic.." payload: "..payload)
+    mqttClient:publish(topic,payload,0,0,onPublishRcvd)
+end
+
+function sendValues(mqttClient)
     local topic=wifi.sta.getmac()
     topic=string.gsub(topic,":","")
 
-    local itemList={}
-    local count=parseLog(itemList)
+    if file.exists(globalFilename) then
+        parseLog(mqttClient,topic)
+    end
 
     if global.t and global.h then
-        local reading={}
-        
-        reading.t=global.t
-        reading.h=global.h
-        itemList[count+1]=reading
+        local payload=getPayload(global.t,global.h)
+
+        publish(mqttClient,topic,payload)
 
         global.t=nil
         global.h=nil
-    end
-
-    for i,reading in ipairs(itemList) do
-        local payload=getPayload(reading.t,reading.h)
-        
-        print("publishing to: "..topic.." payload: "..payload)
-        mqttClient:publish(topic,payload,0,0,onPublishRcvd)
     end
 end
 

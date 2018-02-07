@@ -20,7 +20,7 @@ function doInit()
     checkAndConnect(function(T)
         --dofile("mqtt_cayenne.lua")
         dofile("mqtt_local.lua")
-        connectToBroker(publish)
+        connectToBroker(sendValues)
     end)
 end
 
