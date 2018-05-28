@@ -7,7 +7,7 @@ function doInit()
             writeToFile(global.t, global.h)
         end
         
-        local dsleepSec=30
+        local dsleepSec=600
         print("going to deepsleep for "..dsleepSec.." seconds")
         node.dsleep(dsleepSec*1000*1000)
     end)
@@ -18,7 +18,6 @@ function doInit()
     global.t, global.h=readDHT()
         
     checkAndConnect(function(T)
-        --dofile("mqtt_cayenne.lua")
         dofile("mqtt_local.lua")
         connectToBroker(sendValues)
     end)

@@ -14,19 +14,25 @@ function connectWifi(onConnectClb,w)
             print("connected to: " .. T.SSID .. 
             " on channel: " .. T.channel)
         end)
+
+        wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED,
+        function(T)
+            print("disconnected from: " .. T.SSID .. 
+            " reason: " .. T.reason)
+        end)
+        
     end
-    
+
     local station_cfg={}
     station_cfg.ssid=w.ssid
     station_cfg.pwd=w.pass
     station_cfg.auto=true
     station_cfg.save=false
     
-    wifi.setmode(wifi.STATION)
+    wifi.setmode(wifi.STATION, false)
     wifi.setphymode(wifi.PHYMODE_G)
     
     wifi.sta.clearconfig()
-
     wifi.sta.config(station_cfg)
 end
 
@@ -81,7 +87,8 @@ function checkAPs(index)
         cfg.channel=0
         cfg.show_hidden=1
         cfg.bssid=apList[index].mac
-    
+        
+        wifi.setmode(wifi.STATION, false)
         wifi.sta.getap(cfg,1,getAPClbk)
         
         tmr.alarm(1, 2500, tmr.ALARM_SINGLE, function()

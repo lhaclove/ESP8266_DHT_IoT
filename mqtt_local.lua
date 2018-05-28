@@ -13,7 +13,7 @@ end
 function connectToBroker(onConClb)
 
     local server="192.168.178.36"
-    local client=mqtt.Client(0,60)
+    local client=mqtt.Client(wifi.sta.gethostname(),60)
     mqttOnConClb=onConClb
 
     print("connected: "..tostring(
