@@ -1,8 +1,9 @@
 function doInit()
     dofile("publisher.lua")
     
-    local timeout=15
-    tmr.alarm(0, timeout*1000, tmr.ALARM_SINGLE, function()
+    local timeoutSec=15
+    local timeoutTimer = tmr.create()
+    timeoutTimer:alarm(timeoutSec*1000, tmr.ALARM_SINGLE, function()
         if global.t and global.h then
             writeToFile(global.t, global.h)
         end
@@ -27,6 +28,8 @@ global={}
 global.t=nil
 global.h=nil
 
-local waitTime=3
-print(waitTime.."secs before init. stop timer 0 to prevent.")
-tmr.alarm(0, waitTime*1000, tmr.ALARM_SINGLE, doInit)
+local waitTimeSec=3
+print(waitTimeSec .. " secs before init. call initTimer:unregister() to prevent.")
+
+initTimer = tmr.create()
+initTimer:alarm(waitTimeSec*1000, tmr.ALARM_SINGLE, doInit)

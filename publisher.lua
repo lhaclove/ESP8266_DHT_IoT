@@ -16,6 +16,8 @@ end
 
 function onPublishRcvd(client)
     print("publish received")
+    global.t=nil
+    global.h=nil
 end
 
 function getPayload(temp,humi)
@@ -76,9 +78,6 @@ function sendValues(mqttClient)
         local payload=getPayload(global.t,global.h)
 
         publish(mqttClient,topic,payload)
-
-        global.t=nil
-        global.h=nil
     end
 end
 

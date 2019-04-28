@@ -1,21 +1,24 @@
-function onConnect(client)
-    print("connected callback")
-
-    mqttOnConClb(client)
-
-    print("closed: "..tostring(client:close()))
+function onError(client, reason)
+    print("MQTT connection problem: "..reason)
 end
 
-function onError(client, reason)
-    print("connection problem: "..reason)
+function onConnect(client)
+    mqttOnConClb(client)
+
+    print("MQTT closed: "..tostring(client:close()))
+end
+
+function dnsResolveClb(sk, ip)
+    if ip~=nil then
+        local client=mqtt.Client(wifi.sta.gethostname(),60)
+        print("MQTT connecting to: "..ip.." result="..tostring(
+            client:connect(ip, onConnect, onError)))
+    else
+        print("DNS could not resolve broker")
+    end
 end
 
 function connectToBroker(onConClb)
-
-    local server="192.168.178.36"
-    local client=mqtt.Client(wifi.sta.gethostname(),60)
     mqttOnConClb=onConClb
-
-    print("connected: "..tostring(
-        client:connect(server,onConnect,onError)))
+    net.dns.resolve("raspberrypi", dnsResolveClb)
 end

@@ -19,21 +19,32 @@ function connectWifi(onConnectClb,w)
         function(T)
             print("disconnected from: " .. T.SSID .. 
             " reason: " .. T.reason)
-        end)
-        
+            if T.reason == wifi.eventmon.reason.NO_AP_FOUND then
+                print("Access Point not found, disconnecting...")
+                wifi.sta.disconnect()
+            end
+        end)        
     end
-
-    local station_cfg={}
-    station_cfg.ssid=w.ssid
-    station_cfg.pwd=w.pass
-    station_cfg.auto=true
-    station_cfg.save=false
     
     wifi.setmode(wifi.STATION, false)
     wifi.setphymode(wifi.PHYMODE_G)
+
+    local countryCfg={
+        country="DE",
+        start_ch=1,
+        end_ch=13,
+        policy=wifi.COUNTRY_MANUAL}
+    wifi.setcountry(countryCfg)
     
     wifi.sta.clearconfig()
-    wifi.sta.config(station_cfg)
+
+    local staCfg={
+        ssid=w.ssid,
+        pwd=w.pass,
+        auto=true,
+        save=false
+    }    
+    wifi.sta.config(staCfg)
 end
 
 function getBestAP()
@@ -53,6 +64,7 @@ function getBestAP()
     end
 
     if bestIndex~=0 then
+        print(apList[bestIndex].name .. " is strongest")
         connectWifi(globalOnConnectClb,apList[bestIndex])
     else
         print("no AP in reach")
@@ -82,16 +94,17 @@ function checkAPs(index)
     end
 
     if apList[index]~=nil then
-        local cfg={}
-        cfg.ssid=nil
-        cfg.channel=0
-        cfg.show_hidden=1
-        cfg.bssid=apList[index].mac
+        local cfg={
+            ssid=nil,
+            channel=0,
+            show_hidden=1,
+            bssid=apList[index].mac}
         
         wifi.setmode(wifi.STATION, false)
         wifi.sta.getap(cfg,1,getAPClbk)
-        
-        tmr.alarm(1, 2500, tmr.ALARM_SINGLE, function()
+
+        local checkTimer = tmr.create() 
+        checkTimer:alarm(2500, tmr.ALARM_SINGLE, function()
             checkAPs(index+1)
         end)
     else
