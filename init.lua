@@ -19,7 +19,7 @@ function doInit()
     global.t, global.h=readDHT()
         
     checkAndConnect(function(T)
-        dofile("mqtt_local.lua")
+        dofile("mqtt.lua")
         connectToBroker(sendValues)
     end)
 end
