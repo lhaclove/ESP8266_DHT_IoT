@@ -2,7 +2,7 @@ function connectWifi(onConnectClb,w)
     do
         wifi.eventmon.register(wifi.eventmon.STA_GOT_IP,
         function(T)
-            print("got IP: " .. T.IP .. 
+            print("wifi: got IP: " .. T.IP .. 
             " subnet: " .. T.netmask ..
             " gateway: " .. T.gateway ..
             " dns: " .. net.dns.getdnsserver(0))
@@ -11,16 +11,16 @@ function connectWifi(onConnectClb,w)
 
         wifi.eventmon.register(wifi.eventmon.STA_CONNECTED,
         function(T)
-            print("connected to: " .. T.SSID .. 
+            print("wifi: connected to " .. T.SSID .. 
             " on channel: " .. T.channel)
         end)
 
         wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED,
         function(T)
-            print("disconnected from: " .. T.SSID .. 
+            print("wifi: disconnected from " .. T.SSID .. 
             " reason: " .. T.reason)
             if T.reason == wifi.eventmon.reason.NO_AP_FOUND then
-                print("Access Point not found, disconnecting...")
+                print("wifi: Access Point not found, disconnecting...")
                 wifi.sta.disconnect()
             end
         end)        
@@ -64,25 +64,26 @@ function getBestAP()
     end
 
     if bestIndex~=0 then
-        print(apList[bestIndex].name .. " is strongest")
+        print("wifi: "..apList[bestIndex].name.." is strongest")
         connectWifi(globalOnConnectClb,apList[bestIndex])
     else
-        print("no AP in reach")
+        print("wifi: no AP in reach")
     end
 end
 
 function getAPClbk(list)
     for bssid,v in pairs(list) do
         local rssi=0;
+        
         for val in string.gmatch(v,"-%d+") do
             rssi=tonumber(val)
         end
 
         for i,v in ipairs(apList) do
-            if bssid==v.mac then
+            if string.lower(bssid)==string.lower(v.mac) then
                 v.found=true
                 v.rssi=rssi
-                print("found: "..v.name)
+                print("wifi: found "..v.name)
             end
         end
     end
@@ -99,7 +100,8 @@ function checkAPs(index)
             channel=0,
             show_hidden=1,
             bssid=apList[index].mac}
-        
+            
+        print("wifi: searching "..apList[index].ssid)
         wifi.setmode(wifi.STATION, false)
         wifi.sta.getap(cfg,1,getAPClbk)
 

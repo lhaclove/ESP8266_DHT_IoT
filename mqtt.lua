@@ -1,20 +1,20 @@
 function onError(client, reason)
-    print("MQTT connection problem: "..reason)
+    print("mqtt: connection problem: "..reason)
 end
 
 function onConnect(client)
     mqttOnConClb(client)
 
-    print("MQTT closed: "..tostring(client:close()))
+    print("mqtt: closed connection: "..tostring(client:close()))
 end
 
 function dnsResolveClb(sk, ip)
     if ip~=nil then
         local client=mqtt.Client(wifi.sta.gethostname(),60)
-        print("MQTT connecting to: "..ip.." result="..tostring(
+        print("mqtt: connecting to: "..ip.." result="..tostring(
             client:connect(ip, onConnect, onError)))
     else
-        print("DNS could not resolve broker")
+        print("mqtt: DNS could not resolve broker")
     end
 end
 

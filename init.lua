@@ -9,7 +9,7 @@ function doInit()
         end
         
         local dsleepSec=600
-        print("going to deepsleep for "..dsleepSec.." seconds")
+        print("init: going to deepsleep for "..dsleepSec.." seconds")
         node.dsleep(dsleepSec*1000*1000)
     end)
     
@@ -29,7 +29,7 @@ global.t=nil
 global.h=nil
 
 local waitTimeSec=3
-print(waitTimeSec .. " secs before init. call initTimer:unregister() to prevent.")
+print("init: "..waitTimeSec.." secs before init. call initTimer:unregister() to prevent.")
 
 initTimer = tmr.create()
 initTimer:alarm(waitTimeSec*1000, tmr.ALARM_SINGLE, doInit)

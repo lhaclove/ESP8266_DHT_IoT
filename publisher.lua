@@ -4,27 +4,25 @@ function writeToFile(temp,humi)
         if log then
             local content=temp..";"..humi
     
-            print("writing '"..content.."' to "..globalFilename)
+            print("publisher: writing '"..content.."' to "..globalFilename)
             
             log:writeline(content)
             log:close()
         else
-            print("problem writing "..globalFilename)
+            print("publisher: problem writing "..globalFilename)
         end
     end
 end
 
 function onPublishRcvd(client)
-    print("publish received")
-    global.t=nil
-    global.h=nil
+    print("publisher: publish received")
 end
 
 function getPayload(temp,humi)
     local payload='{"t":'..tostring(temp)..
     ',"h":'..tostring(humi)..'}'
 
-    print("paylod: "..payload)
+    print("publisher: paylod: "..payload)
     
     return payload
 end
@@ -37,7 +35,7 @@ function parseLog(mqttClient,topic)
         local line=log:readline()
         while line do
             line=line:gsub("\n","")
-            print(count.." read "..line)
+            print("publisher: read line "..count.." -> "..line)
 
             count=count+1
             
@@ -54,15 +52,15 @@ function parseLog(mqttClient,topic)
         log:close()
         file.remove(globalFilename)
     else
-        print("problem reading "..globalFilename)
+        print("publisher: problem reading "..globalFilename)
     end
 
-    print("read "..count.." entries from log")
+    print("publisher: read "..count.." entries from log")
     return count
 end
 
 function publish(mqttClient,topic,payload)
-    print("publishing to: "..topic.." payload: "..payload)
+    print("publisher: publishing payload: "..payload.." to "..topic)
     mqttClient:publish(topic,payload,0,0,onPublishRcvd)
 end
 
@@ -78,6 +76,9 @@ function sendValues(mqttClient)
         local payload=getPayload(global.t,global.h)
 
         publish(mqttClient,topic,payload)
+
+        global.t=nil
+        global.h=nil
     end
 end
 
